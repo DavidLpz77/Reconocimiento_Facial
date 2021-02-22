@@ -1,5 +1,5 @@
 # Reconocimiento_Facial
-David Ricardo Lopez Amador - 20161020505
+**David Ricardo Lopez Amador - 20161020505**
 
 Proyecto : Sistema de control de acceso a trabajadores basado en reconocimiento facial
 
