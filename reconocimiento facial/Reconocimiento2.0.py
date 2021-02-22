@@ -1,4 +1,7 @@
 #David Ricardo Lopez A - 20161020505
+#Proyecto de reconocimiento facial para control de ingreso de empleados
+
+
 #Importa las librerias necesarias
 import os
 import cv2
@@ -32,11 +35,13 @@ def enviar_correo(MY_ADDRESS,PASSWORD,mensaje,TO):
     s.send_message(msg)
     del msg
 
-    # Finaliar sesion SMTP
+    # Finalizar sesion SMTP
     s.quit()
 
 #Funcion para crear el usuario en la base de datos
 def crear_usuario(conexion, datos_empleados):
+    #inserta el usuario, el email y la hora de llegada en la base de datos
+    #en la tabla datos_empleados
     sql = 'INSERT INTO datos_empleados (nombre,email, hora) VALUES (?,?,?);'
 
     cursor = conexion.cursor()
@@ -54,6 +59,7 @@ def conexion_bd(Empleados):
 
  #Funcion para consultar el email de los empleados        
 def buscar(conexion,nombre):
+    #selecciona el nombre y email de la tabla usuarios
     sql = "SELECT email FROM Usuarios WHERE (nombre = '{}')".format(nombre)
 
     cursor = conexion.cursor()
@@ -135,17 +141,18 @@ while 1:
                     ahora = datetime.datetime.now()
                     hora_entrada= datetime.time(8,15,00)
                     hora_entrada=ahora.strftime('%H: %M: %S')
-                    email=buscar(conexion,nombre_db) 
-                    datos_empleados = (nombre_db,str(email),hora_entrada)
+                    email=buscar(conexion,nombre) 
+                    datos_empleados = (nombre,str(email),hora_entrada)
                     crear_usuario(conexion,datos_empleados)
                     print('Rostro reconocido presione la tecla (A) para la siguiente persona')
                     i=False
                     #cuerpo del mensaje del email enviardo
-                    mensaje='El empleado : ' + nombre_db + ' llego tarde a las: ' + hora_entrada + ' ¡¡¡¡¡¡¡¡PASARLE MEMORANDO!!!!!!!!'
+                    mensaje='El empleado : ' + nombre + ' llego tarde a las: ' + hora_entrada + ' ¡¡¡¡¡¡¡¡PASARLE MEMORANDO!!!!!!!!'
                     print('Su hora de llegada es: ' +hora_entrada)
                     #verifica si la hora de entrada es tardia 
                     if hora_entrada>hora_llegada:
                         print('¡¡¡¡¡¡ LLEGO TARDE !!!!!!')
+                        print(nombre)
                         enviar_correo(MY_ADDRESS,PASSWORD,mensaje,TO)
 
 
@@ -161,8 +168,10 @@ while 1:
         cv2.imshow('Output', img)
         #Define las teclas para cerrar el aplicativo y para capturar rostro
         k = cv2.waitKey(5) & 0xFF
+        #97 codigo asscii de la letra (A)
         if k==97:
             i=True
+        #13 es codigo asscii de la tecla "ENTER"
         if k == 13:
             cv2.destroyAllWindows()
             break
